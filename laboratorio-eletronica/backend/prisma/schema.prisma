@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ALUNO
+  PROFESSOR
+}
+
+enum InvitationStatus {
+  PENDENTE
+  ACEITA
+  RECUSADA
+}
+
+enum AssignmentStatus {
+  RASCUNHO
+  PUBLICADA
+}
+
+enum SubmissionStatus {
+  ENVIADA
+  CORRIGIDA
+  ATRASADA
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ALUNO)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  student  Student?
+  teacher  Teacher?
+  notifications Notification[]
+
+  @@index([role])
+}
+
+model Student {
+  id                 String  @id @default(uuid())
+  userId             String  @unique
+  registrationNumber String  @unique
+  course             String
+  semester           Int     @default(1)
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamMembers     TeamMember[]
+  teamInvitations TeamInvitation[]
+  submissions     Submission[]
+  ledTeams        Team[]           @relation("TeamLeader")
+
+  @@index([registrationNumber])
+}
+
+model Teacher {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignments Assignment[]
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  description String   @default("")
+  leaderId    String
+  createdAt   DateTime @default(now())
+
+  leader      Student          @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invitations TeamInvitation[]
+
+  @@index([leaderId])
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String
+  studentId String
+  joinedAt  DateTime @default(now())
+
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, studentId])
+  @@index([studentId])
+}
+
+model TeamInvitation {
+  id        String           @id @default(uuid())
+  teamId    String
+  studentId String
+  status    InvitationStatus @default(PENDENTE)
+  createdAt DateTime         @default(now())
+
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, studentId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model Assignment {
+  id          String           @id @default(uuid())
+  title       String
+  description String           @default("")
+  instructions String          @default("")
+  turma       String           @default("")
+  teacherId   String
+  dueDate     DateTime
+  status      AssignmentStatus @default(RASCUNHO)
+  createdAt   DateTime         @default(now())
+
+  teacher     Teacher      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  questions   Question[]
+  submissions Submission[]
+
+  @@index([teacherId])
+  @@index([status])
+}
+
+model Question {
+  id           String      @id @default(uuid())
+  assignmentId String
+  text         String
+  type         String
+  points       Float       @default(1)
+  order        Int         @default(0)
+
+  assignment Assignment      @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  options    QuestionOption[]
+  answers    Answer[]
+
+  @@index([assignmentId])
+}
+
+model QuestionOption {
+  id         String  @id @default(uuid())
+  questionId String
+  text       String
+  correct    Boolean @default(false)
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+}
+
+model Submission {
+  id           String           @id @default(uuid())
+  assignmentId String
+  studentId    String
+  submittedAt  DateTime         @default(now())
+  status       SubmissionStatus @default(ENVIADA)
+  grade        Float?
+  feedback     String?
+  late         Boolean          @default(false)
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers    Answer[]
+
+  @@unique([assignmentId, studentId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model Answer {
+  id           String @id @default(uuid())
+  submissionId String
+  questionId   String
+  answer       String
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, questionId])
+  @@index([submissionId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+}
