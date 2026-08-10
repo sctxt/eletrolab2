@@ -15,8 +15,10 @@ app.use('/api', apiRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(config.port, () => {
-  console.log(`API do Laboratório de Eletrônica rodando em http://localhost:${config.port}`);
-});
+if (require.main === module && !process.env.VERCEL) {
+  app.listen(config.port, () => {
+    console.log(`API do Laboratório de Eletrônica rodando em http://localhost:${config.port}`);
+  });
+}
 
 module.exports = app;

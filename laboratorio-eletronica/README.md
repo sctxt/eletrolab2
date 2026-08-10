@@ -114,6 +114,33 @@ npm run dev
 
 O frontend fica em `http://localhost:5173` e redireciona requisições `/api/*` para o backend via proxy.
 
+## Deploy na Vercel
+
+O repositório já inclui um `vercel.json` na raiz que faz o deploy de **frontend e backend em um único projeto**:
+
+- `frontend/` é compilado com `vite build` (build estático servido como SPA).
+- `backend/src/server.js` é publicado como função serverless (`@vercel/node`), servindo todas as rotas `/api/*`.
+- Rotas de SPA (`/aluno/*`, `/professor/*`, etc.) caem no `index.html`.
+
+### Passos
+
+1. Importe o repositório em [vercel.com/new](https://vercel.com/new) (pasta raiz do projeto, onde está o `vercel.json`).
+2. Em **Settings → Environment Variables**, configure:
+
+   ```env
+   JWT_SECRET="um-segredo-bem-longo-e-aleatorio"
+   JWT_EXPIRES_IN="8h"
+   BCRYPT_SALT_ROUNDS=10
+   CLIENT_URL="https://seu-dominio.vercel.app"
+   FIREBASE_PROJECT_ID="eletrolab2"
+   FIREBASE_SERVICE_ACCOUNT='{ "type": "service_account", ... }'
+   ```
+
+   O `FIREBASE_SERVICE_ACCOUNT` aceita o JSON do service account (com quebras de linha) ou a versão base64.
+3. Deploy. Depois rode o seed uma vez apontando para o mesmo projeto Firestore para popular os dados iniciais (ou execute `npm run seed` localmente com as mesmas variáveis).
+
+> No Vercel o frontend e a API ficam no mesmo domínio, então as chamadas a `/api/*` são same-origin e não dependem do proxy de desenvolvimento nem de CORS.
+
 ## Credenciais de teste (seed)
 
 | Papel | Usuário | Senha |
