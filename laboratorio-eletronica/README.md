@@ -28,7 +28,7 @@ Plataforma web full-stack em português (pt-BR) para gestão do Laboratório de 
 
 ### Backend (`backend/`)
 - Node.js + Express
-- Prisma ORM + PostgreSQL
+- **Firebase** (Firebase Admin SDK) com **Firestore** como banco de dados (camada `src/db/firestore.js` com API compatível com a utilizada anteriormente pelo Prisma)
 - JWT (`jsonwebtoken`) + `bcryptjs`
 - CORS e variáveis de ambiente via `dotenv`
 
@@ -43,16 +43,15 @@ Plataforma web full-stack em português (pt-BR) para gestão do Laboratório de 
 ```
 laboratorio-eletronica/
 ├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma      # Modelo de dados (12 modelos + 4 enums)
-│   │   ├── migrations/        # Migrações aplicadas
-│   │   └── seed.js            # Dados iniciais (1 professor, 5 alunos, 2 equipes)
 │   ├── src/
 │   │   ├── server.js          # Entrada da API (porta 3001)
+│   │   ├── config/            # env + inicialização do Firebase (firebase.js)
+│   │   ├── db/firestore.js    # Camada de acesso ao Firestore
 │   │   ├── controllers/       # Auth, aluno, professor, equipes, listas, entregas, etc.
-│   │   ├── routes/            # Rotas /api
-│   │   ├── middleware/        # Auth JWT e autorização por papel
-│   │   └── utils/
+│   │   ├── services/          # Notificações e Storage
+│   │   ├── middleware/        # Auth JWT, autorização por papel e upload
+│   │   └── routes/            # Rotas /api
+│   ├── prisma/seed.js         # Seed compatível (popula o Firestore)
 │   ├── .env.example
 │   └── package.json
 └── frontend/
@@ -70,22 +69,25 @@ laboratorio-eletronica/
 ## Pré-requisitos
 
 - Node.js 18+
-- PostgreSQL 12+
+- Projeto no **Firebase** (Firestore + Storage) e o **service account** correspondente
 
 ## Configuração
 
-### 1. Banco de dados
+### 1. Firebase
 
-Crie um banco PostgreSQL e ajuste `DATABASE_URL` no arquivo `backend/.env` (copie de `.env.example`):
+Crie um projeto no Firebase com **Firestore** e **Storage** habilitados e gere um **service account** (console > Configurações do projeto > Contas de serviço > Gerar nova chave privada). Em seguida configure `backend/.env` (copie de `.env.example`):
 
 ```env
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/laboratorio_eletronica?schema=public"
 PORT=3001
 JWT_SECRET="um-segredo-bem-longo-e-aleatorio"
 JWT_EXPIRES_IN="8h"
 BCRYPT_SALT_ROUNDS=10
 CLIENT_URL="http://localhost:5173"
+FIREBASE_PROJECT_ID="eletrolab2"
+FIREBASE_SERVICE_ACCOUNT='{ "type": "service_account", ... }'
 ```
+
+> O `FIREBASE_SERVICE_ACCOUNT` pode ser o JSON do service account **ou** sua versão em base64. Sem ele a API inicia, mas as operações no Firestore retornam erro `FIREBASE_NOT_CONFIGURED`.
 
 ### 2. Backend
 
@@ -93,14 +95,8 @@ CLIENT_URL="http://localhost:5173"
 cd backend
 npm install
 
-# Aplicar as migrações do banco
-npx prisma migrate deploy
-
-# Gerar o client do Prisma
-npx prisma generate
-
-# (Opcional) Popular o banco com dados iniciais
-npm run prisma:seed
+# (Opcional) Popular o Firestore com dados iniciais
+npm run seed
 
 # Iniciar a API
 npm start

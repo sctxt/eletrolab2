@@ -1,5 +1,3 @@
-const { PrismaClient } = require('@prisma/client');
+const firestore = require('../db/firestore');
 
-const prisma = new PrismaClient();
-
-module.exports = prisma;
+module.exports = firestore;

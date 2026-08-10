@@ -1,24 +1,24 @@
-const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const db = require('../src/db/firestore');
 
-const prisma = new PrismaClient();
+const ORDER = [
+  'answer',
+  'submission',
+  'questionOption',
+  'question',
+  'assignment',
+  'teamInvitation',
+  'teamMember',
+  'team',
+  'notification',
+  'student',
+  'teacher',
+  'user'
+];
 
 async function main() {
-  console.log('Limpando banco de dados existente...');
-  await prisma.$transaction([
-    prisma.answer.deleteMany(),
-    prisma.submission.deleteMany(),
-    prisma.questionOption.deleteMany(),
-    prisma.question.deleteMany(),
-    prisma.assignment.deleteMany(),
-    prisma.teamInvitation.deleteMany(),
-    prisma.teamMember.deleteMany(),
-    prisma.team.deleteMany(),
-    prisma.notification.deleteMany(),
-    prisma.student.deleteMany(),
-    prisma.teacher.deleteMany(),
-    prisma.user.deleteMany()
-  ]);
+  console.log('Limpando dados existentes no Firestore...');
+  await db.$transaction(ORDER.map((model) => db[model].deleteMany()));
 
   console.log('Criando senha padrão...');
   const password = await bcrypt.hash('123456', 10);
@@ -30,7 +30,7 @@ async function main() {
   };
 
   console.log('Criando professor...');
-  const teacherUser = await prisma.user.create({
+  const teacherUser = await db.user.create({
     data: {
       name: 'Prof. Carlos Mendes',
       email: 'professor@lab.com',
@@ -38,7 +38,7 @@ async function main() {
       role: 'PROFESSOR'
     }
   });
-  const teacher = await prisma.teacher.create({ data: { userId: teacherUser.id } });
+  const teacher = await db.teacher.create({ data: { userId: teacherUser.id } });
 
   console.log('Criando estudantes...');
   const studentsData = [
@@ -52,7 +52,7 @@ async function main() {
   const students = [];
   for (const data of studentsData) {
     const email = `${data.registrationNumber}@aluno.ifce.edu.br`;
-    const user = await prisma.user.create({
+    const user = await db.user.create({
       data: {
         name: data.name,
         email,
@@ -60,7 +60,7 @@ async function main() {
         role: 'ALUNO'
       }
     });
-    const student = await prisma.student.create({
+    const student = await db.student.create({
       data: {
         userId: user.id,
         registrationNumber: data.registrationNumber,
@@ -72,7 +72,7 @@ async function main() {
   }
 
   console.log('Criando equipes...');
-  const team1 = await prisma.team.create({
+  const team1 = await db.team.create({
     data: {
       name: 'Circuito Vivo',
       description: 'Equipe focada em projetos de circuitos analógicos e sensores.',
@@ -83,7 +83,7 @@ async function main() {
     }
   });
 
-  const team2 = await prisma.team.create({
+  const team2 = await db.team.create({
     data: {
       name: 'Núcleo Digital',
       description: 'Grupo de estudos em sistemas digitais e microcontroladores.',
@@ -95,7 +95,7 @@ async function main() {
   });
 
   console.log('Criando listas de exercícios...');
-  const assignment1 = await prisma.assignment.create({
+  const assignment1 = await db.assignment.create({
     data: {
       title: 'Leis de Kirchhoff',
       description: 'Exercícios sobre análise de circuitos com malhas e nós.',
@@ -151,7 +151,7 @@ async function main() {
     include: { questions: true }
   });
 
-  const assignment2 = await prisma.assignment.create({
+  const assignment2 = await db.assignment.create({
     data: {
       title: 'Circuitos com Resistores',
       description: 'Associação de resistores em série, paralelo e mista.',
@@ -193,7 +193,7 @@ async function main() {
     include: { questions: true }
   });
 
-  const assignment3 = await prisma.assignment.create({
+  const assignment3 = await db.assignment.create({
     data: {
       title: 'Projeto: Fonte de Alimentação',
       description: 'Projeto prático de uma fonte de alimentação regulada.',
@@ -220,7 +220,7 @@ async function main() {
     }
   });
 
-  const assignment4 = await prisma.assignment.create({
+  const assignment4 = await db.assignment.create({
     data: {
       title: 'Rascunho: Amplificador Operacional',
       description: 'Lista em rascunho sobre amplificadores operacionais.',
@@ -242,11 +242,11 @@ async function main() {
   });
 
   console.log('Criando submissões de exemplo...');
-  const q1 = await prisma.question.findMany({ where: { assignmentId: assignment1.id }, orderBy: { order: 'asc' } });
-  const q2 = await prisma.question.findMany({ where: { assignmentId: assignment2.id }, orderBy: { order: 'asc' } });
-  const q3 = await prisma.question.findMany({ where: { assignmentId: assignment3.id }, orderBy: { order: 'asc' } });
+  const q1 = await db.question.findMany({ where: { assignmentId: assignment1.id }, orderBy: { order: 'asc' } });
+  const q2 = await db.question.findMany({ where: { assignmentId: assignment2.id }, orderBy: { order: 'asc' } });
+  const q3 = await db.question.findMany({ where: { assignmentId: assignment3.id }, orderBy: { order: 'asc' } });
 
-  const submission1 = await prisma.submission.create({
+  const submission1 = await db.submission.create({
     data: {
       assignmentId: assignment1.id,
       studentId: students[0].id,
@@ -265,7 +265,7 @@ async function main() {
     }
   });
 
-  const submission2 = await prisma.submission.create({
+  const submission2 = await db.submission.create({
     data: {
       assignmentId: assignment1.id,
       studentId: students[2].id,
@@ -282,7 +282,7 @@ async function main() {
     }
   });
 
-  await prisma.submission.create({
+  await db.submission.create({
     data: {
       assignmentId: assignment2.id,
       studentId: students[1].id,
@@ -300,7 +300,7 @@ async function main() {
     }
   });
 
-  await prisma.submission.create({
+  await db.submission.create({
     data: {
       assignmentId: assignment3.id,
       studentId: students[3].id,
@@ -321,7 +321,7 @@ async function main() {
   console.log('Criando notificações de exemplo...');
   const names = studentsData.map((d) => d.name);
 
-  await prisma.notification.createMany({
+  await db.notification.createMany({
     data: [
       {
         userId: teacherUser.id,
@@ -344,7 +344,7 @@ async function main() {
     ]
   });
 
-  const pendingInvitation = await prisma.teamInvitation.create({
+  const pendingInvitation = await db.teamInvitation.create({
     data: {
       teamId: team1.id,
       studentId: students[3].id,
@@ -368,5 +368,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await db.$disconnect();
   });
