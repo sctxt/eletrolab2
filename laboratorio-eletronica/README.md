@@ -116,11 +116,11 @@ O frontend fica em `http://localhost:5173` e redireciona requisições `/api/*` 
 
 ## Deploy na Vercel
 
-O repositório já inclui um `vercel.json` na **raiz do repositório** que faz o deploy de **frontend e backend em um único projeto**:
+O repositório já inclui um `vercel.json` na **raiz do repositório** que faz o deploy de **frontend e backend em um único projeto** (configuração moderna, sem `builds` legados):
 
-- `laboratorio-eletronica/frontend/` é compilado com `vite build` (build estático servido como SPA).
-- `laboratorio-eletronica/backend/src/server.js` é publicado como função serverless (`@vercel/node`), servindo todas as rotas `/api/*`.
-- Rotas de SPA (`/aluno/*`, `/professor/*`, etc.) caem no `index.html`.
+- `api/index.js` reexporta o app Express do backend como uma [Vercel Function](https://vercel.com/docs/functions) que atende todas as rotas `/api/*`.
+- `laboratorio-eletronica/frontend/` é compilado com `vite build`; o `dist` é servido como build estático (SPA).
+- `rewrites`: `/api/(.*)` vai para a função; o restante cai no `index.html` (SPA).
 
 ### Passos
 

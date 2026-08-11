@@ -1,22 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "builds": [
-    {
-      "src": "laboratorio-eletronica/backend/src/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "laboratorio-eletronica/frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/laboratorio-eletronica/backend/src/server.js" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "framework": null,
+  "installCommand": "npm install --prefix laboratorio-eletronica/frontend && npm install --prefix laboratorio-eletronica/backend && npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "laboratorio-eletronica/frontend/dist",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "name": "eletrolab2-deploy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deploy da plataforma do Laboratório de Eletrônica IFCE Maranguape na Vercel (frontend + API em um único projeto)",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "npm run build --prefix laboratorio-eletronica/frontend"
+  }
+}
