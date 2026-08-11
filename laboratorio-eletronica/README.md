@@ -1,186 +1,307 @@
-# Plataforma do Laboratório de Eletrônica — IFCE Campus Maranguape
+# Plataforma do Laboratório de Eletrônica
 
-Plataforma web full-stack em português (pt-BR) para gestão do Laboratório de Eletrônica do IFCE Campus Maranguape. Permite ao professor criar e corrigir listas de exercícios, gerenciar alunos e equipes, e acompanhar relatórios de desempenho. Os alunos resolvem listas, recebem notas e notificações, e trabalham em equipes com convites.
+Sistema de gestão acadêmica para o **Laboratório de Eletrônica do IFCE Campus Maranguape**. A plataforma conecta professores, alunos e administração em um único ambiente: o professor cria e corrige listas de exercícios, gerencia turmas e equipes e acompanha o desempenho; os alunos resolvem listas, recebem notas e notificações e trabalham em equipe com convites; e a administração gerencia todas as contas pelo painel administrativo.
+
+![Node](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4.x-000000?logo=express&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firestore-FFCA28?logo=firebase&logoColor=black)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-B7473C?logo=vite&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-deploy-000000?logo=vercel&logoColor=white)
+
+---
+
+## Sumário
+
+- [Funcionalidades](#funcionalidades)
+- [Tecnologias](#tecnologias)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Começando](#começando)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Banco de dados e seed](#banco-de-dados-e-seed)
+- [Painel administrativo](#painel-administrativo)
+- [Deploy na Vercel](#deploy-na-vercel)
+- [Visão geral da API](#visão-geral-da-api)
+- [Credenciais de teste](#credenciais-de-teste)
+- [Scripts](#scripts)
+- [Licença](#licença)
+
+---
 
 ## Funcionalidades
 
-### Autenticação e Perfis (RBAC)
-- Login por matrícula para **alunos** e por e-mail para **professor**.
-- Tokens JWT com expiração e senhas criptografadas com `bcrypt`.
-- Rotas protegidas por papel (`ALUNO` / `PROFESSOR`) no backend e no frontend.
+### Autenticação e perfis (RBAC)
+
+- Três papéis com controle de acesso completo: **ALUNO**, **PROFESSOR** e **ADMIN**.
+- Login do aluno por **matrícula**; professor por **e-mail**; administrador por **usuário**.
+- Senhas criptografadas com `bcrypt` e sessões com **JWT** (expiração configurável).
+- Rotas protegidas por papel tanto no backend (`authenticate` + `authorize`) quanto no frontend (`ProtectedRoute` + `Sidebar` por papel).
 
 ### Aluno
-- **Início**: resumo com estatísticas, convites pendentes, prazos, atividades recentes e notificações.
-- **Minha Equipe**: criar equipe, convidar colegas, aceitar/recusar convites, transferir liderança, remover membros e sair/excluir equipe.
-- **Listas**: visualizar listas publicadas, prazos e responder questões de 4 tipos (múltipla escolha, verdadeiro/falso, resposta curta e dissertativa).
-- **Histórico**: notas e feedback de todas as entregas corrigidas.
-- **Notificações**: avisos de novos convites, listas publicadas e correções realizadas.
+
+- **Início** — resumo com estatísticas, convites pendentes, prazos, atividades recentes e notificações.
+- **Minha Equipe** — criar equipe, convidar colegas, aceitar/recusar convites, transferir liderança, remover membros, sair ou excluir a equipe.
+- **Listas** — visualizar listas publicadas, prazos e responder questões de 4 tipos (múltipla escolha, verdadeiro/falso, resposta curta e dissertativa).
+- **Histórico** — notas e feedback de todas as entregas corrigidas.
+- **Notificações** — avisos de convites, listas publicadas e correções realizadas.
 
 ### Professor
-- **Início**: estatísticas da turma, listas pendentes de correção e atividades recentes.
-- **Listas**: criar, editar, publicar, duplicar e excluir listas, com configuração de prazo e turma.
-- **Correções**: revisar entregas, atribuir nota e feedback (com sugestão automática de pontos objetivos), e registrar notificação para o aluno.
-- **Alunos**: lista de estudantes com matrícula, curso, semestre e desempenho.
-- **Equipes**: visualizar todas as equipes e seus integrantes.
-- **Relatórios**: gráficos de desempenho por aluno e por lista, com dados agregados do banco.
+
+- **Início** — estatísticas da turma, listas pendentes de correção e atividades recentes.
+- **Listas** — criar, editar, publicar, duplicar e excluir listas, com prazo e turma configuráveis.
+- **Correções** — revisar entregas, atribuir nota e feedback (com sugestão automática de pontos objetivos) e notificar o aluno.
+- **Alunos** — lista com matrícula, curso, semestre e desempenho.
+- **Equipes** — visualizar todas as equipes e seus integrantes.
+- **Relatórios** — gráficos de desempenho por aluno e por lista com dados agregados do banco.
+
+### Administrador
+
+- **Painel** — estatísticas gerais (alunos, professores, ativos e inativos).
+- **Contas** — criar contas de alunos, professores e administradores; editar dados; redefinir senhas; ativar/desativar acessos.
+- Acesso pela rota `/login/admin` (link na landing page).
+
+### Plataforma
+
+- Interface **100% em pt-BR**, tema verde institucional, responsiva (desktop/tablet/mobile).
+- Componentes de UI reutilizáveis, feedback visual com toasts e formulários com validação.
+- Backend e frontend publicados no **mesmo domínio** (SPA + API `/api/*`), sem depender de CORS ou proxy em produção.
+
+---
 
 ## Tecnologias
 
-### Backend (`backend/`)
-- Node.js + Express
-- **Firebase** (Firebase Admin SDK) com **Firestore** como banco de dados (camada `src/db/firestore.js` com API compatível com a utilizada anteriormente pelo Prisma)
-- JWT (`jsonwebtoken`) + `bcryptjs`
-- CORS e variáveis de ambiente via `dotenv`
+**Backend** (`backend/`)
 
-### Frontend (`frontend/`)
-- React 18 + Vite
-- React Router v6
-- CSS padrão (sem frameworks), tema verde institucional, responsivo (desktop/tablet/mobile)
-- Proxy de desenvolvimento `/api` → backend (`localhost:3001`)
+| Ferramenta | Uso |
+|---|---|
+| Node.js + Express | API REST |
+| Firebase Admin SDK + Firestore | Banco de dados (camada `src/db/firestore.js` com API compatível com o Prisma) |
+| jsonwebtoken | Autenticação por tokens JWT |
+| bcryptjs | Hash de senhas |
+| cors + dotenv | CORS e variáveis de ambiente |
 
-## Estrutura
+**Frontend** (`frontend/`)
+
+| Ferramenta | Uso |
+|---|---|
+| React 18 | Interface de usuário |
+| Vite | Bundler e dev server (com proxy `/api` → `localhost:3001`) |
+| React Router v6 | Roteamento com guardas de papel |
+| CSS padrão | Estilização sem frameworks, tema institucional |
+
+---
+
+## Estrutura do projeto
 
 ```
 laboratorio-eletronica/
 ├── backend/
 │   ├── src/
-│   │   ├── server.js          # Entrada da API (porta 3001)
-│   │   ├── config/            # env + inicialização do Firebase (firebase.js)
-│   │   ├── db/firestore.js    # Camada de acesso ao Firestore
-│   │   ├── controllers/       # Auth, aluno, professor, equipes, listas, entregas, etc.
-│   │   ├── services/          # Notificações e Storage
-│   │   ├── middleware/        # Auth JWT, autorização por papel e upload
-│   │   └── routes/            # Rotas /api
-│   ├── prisma/seed.js         # Seed compatível (popula o Firestore)
+│   │   ├── server.js            # Entrada da API (porta 3001)
+│   │   ├── config/              # env + inicialização do Firebase
+│   │   ├── db/firestore.js      # Camada de acesso ao Firestore
+│   │   ├── controllers/         # Auth, aluno, professor, equipes, listas, entregas, relatórios, admin...
+│   │   ├── services/            # Notificações e Storage
+│   │   ├── middleware/          # Auth JWT, autorização por papel e error handler
+│   │   └── routes/              # Rotas /api
+│   ├── prisma/seed.js           # Seed que popula o Firestore
+│   ├── scripts/createAdmin.js   # Cria administrador sem apagar dados
 │   ├── .env.example
 │   └── package.json
 └── frontend/
     ├── src/
-    │   ├── pages/             # páginas públicas, do aluno e do professor
-    │   ├── components/        # componentes de UI, sidebar, rotas protegidas
-    │   ├── context/           # Auth e Toast
-    │   ├── services/api.js    # cliente HTTP da API
-    │   ├── layouts/           # PublicLayout e PanelLayout
-    │   └── routes/            # árvore de rotas com guardas de papel
-    ├── vite.config.js         # porta 5173 + proxy /api
+    │   ├── pages/               # Públicas, aluno, professor, admin e compartilhadas
+    │   ├── components/          # Sidebar, ProtectedRoute e UI kit
+    │   ├── context/             # Auth e Toast
+    │   ├── services/api.js      # Cliente HTTP da API
+    │   ├── layouts/             # PublicLayout e PanelLayout
+    │   ├── routes/              # Árvore de rotas com guardas de papel
+    │   └── styles/              # CSS global
+    ├── vite.config.js           # Porta 5173 + proxy /api
     └── package.json
 ```
 
-## Pré-requisitos
+**Arquitetura em produção (Vercel)**
 
-- Node.js 18+
-- Projeto no **Firebase** (Firestore) e o **service account** correspondente
+```mermaid
+flowchart LR
+    Browser["Navegador"]
+    Domain["Vercel - mesmo domínio"]
+    Api["Vercel Function /api/*"]
+    SPA["Build estático (dist)"]
+    Firestore["Cloud Firestore"]
 
-## Configuração
-
-### 1. Firebase
-
-Crie um projeto no Firebase com **Firestore** habilitado e gere um **service account** (console > Configurações do projeto > Contas de serviço > Gerar nova chave privada). Em seguida configure `backend/.env` (copie de `.env.example`):
-
-```env
-PORT=3001
-JWT_SECRET="um-segredo-bem-longo-e-aleatorio"
-JWT_EXPIRES_IN="8h"
-BCRYPT_SALT_ROUNDS=10
-CLIENT_URL="http://localhost:5173"
-FIREBASE_PROJECT_ID="eletrolab2"
-FIREBASE_SERVICE_ACCOUNT='{ "type": "service_account", ... }'
+    Browser --> Domain
+    Domain --> Api
+    Domain --> SPA
+    Api --> Firestore
 ```
 
-> O `FIREBASE_SERVICE_ACCOUNT` pode ser o JSON do service account **ou** sua versão em base64. Sem ele a API inicia, mas as operações no Firestore retornam erro `FIREBASE_NOT_CONFIGURED`.
+---
+
+## Começando
+
+### Pré-requisitos
+
+- **Node.js 18+**
+- Projeto no **Firebase** com **Firestore** habilitado e um **service account** (JSON)
+
+### 1. Configurar o Firebase
+
+1. Crie um projeto no [Firebase](https://console.firebase.google.com) e habilite o **Cloud Firestore**.
+2. Gere um service account: **Configurações do projeto > Contas de serviço > Gerar nova chave privada**.
+3. Copie `backend/.env.example` para `backend/.env` e preencha (veja [Variáveis de ambiente](#variáveis-de-ambiente)).
 
 ### 2. Backend
 
-# Instalar dependências
+```bash
 cd backend
 npm install
-
-# (Opcional) Popular o Firestore com dados iniciais
-npm run seed
-
-# Iniciar a API
-npm start
+npm run seed       # opcional: popula o Firestore com dados de demonstração
+npm start          # ou npm run dev (hot reload)
 ```
 
-A API fica disponível em `http://localhost:3001` (health check em `GET /api/health`).
+A API sobe em `http://localhost:3001` (health check em `GET /api/health`).
 
 ### 3. Frontend
 
-# Em outro terminal
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-O frontend fica em `http://localhost:5173` e redireciona requisições `/api/*` para o backend via proxy.
+O frontend sobe em `http://localhost:5173` e encaminha as requisições `/api/*` para o backend via proxy.
 
-## Deploy na Vercel
+---
 
-O repositório já inclui um `vercel.json` na **raiz do repositório** que faz o deploy de **frontend e backend em um único projeto** (configuração moderna, sem `builds` legados):
+## Variáveis de ambiente
 
-- `api/index.js` reexporta o app Express do backend como uma [Vercel Function](https://vercel.com/docs/functions) que atende todas as rotas `/api/*`.
-- `laboratorio-eletronica/frontend/` é compilado com `vite build`; o `dist` é servido como build estático (SPA).
-- `rewrites`: `/api/(.*)` vai para a função; o restante cai no `index.html` (SPA).
+Arquivo `backend/.env` (base: `backend/.env.example`):
 
-### Passos
+| Variável | Descrição | Obrigatória |
+|---|---|---|
+| `PORT` | Porta da API | não (padrão 3001) |
+| `JWT_SECRET` | Segredo para assinar os tokens JWT | sim |
+| `JWT_EXPIRES_IN` | Tempo de expiração (ex.: `8h`) | sim |
+| `BCRYPT_SALT_ROUNDS` | Custo do hash de senha | sim |
+| `CLIENT_URL` | Origem permitida pelo CORS | sim |
+| `FIREBASE_PROJECT_ID` | ID do projeto Firebase | sim |
+| `FIREBASE_SERVICE_ACCOUNT` | JSON do service account (ou base64) | sim |
 
-1. Importe o repositório em [vercel.com/new](https://vercel.com/new). Mantenha o **Root Directory** na raiz do repositório (o `vercel.json` já fica lá).
-2. Em **Settings → Environment Variables**, configure:
+> Sem `FIREBASE_SERVICE_ACCOUNT` a API inicia, mas as operações no Firestore retornam `FIREBASE_NOT_CONFIGURED`.
 
-   ```env
-   JWT_SECRET="um-segredo-bem-longo-e-aleatorio"
-   JWT_EXPIRES_IN="8h"
-   BCRYPT_SALT_ROUNDS=10
-   CLIENT_URL="https://seu-dominio.vercel.app"
-   FIREBASE_PROJECT_ID="eletrolab2"
-   FIREBASE_SERVICE_ACCOUNT='{ "type": "service_account", ... }'
-   ```
+---
 
-   O `FIREBASE_SERVICE_ACCOUNT` aceita o JSON do service account (com quebras de linha) ou a versão base64.
-3. Deploy. Depois rode o seed uma vez apontando para o mesmo projeto Firestore para popular os dados iniciais (ou execute `npm run seed` localmente com as mesmas variáveis).
+## Banco de dados e seed
 
-> No Vercel o frontend e a API ficam no mesmo domínio, então as chamadas a `/api/*` são same-origin e não dependem do proxy de desenvolvimento nem de CORS.
+O projeto usa o **Cloud Firestore** como banco. A camada `src/db/firestore.js` expõe uma API compatível com a utilizada anteriormente pelo Prisma, mantendo controllers e rotas estáveis.
 
-## Credenciais de teste (seed)
+O seed (`npm run seed`) popula o Firestore com:
 
-| Papel | Usuário | Senha |
-|-------|---------|-------|
-| Administrador | `adminifce67` | `adminifce67` |
-| Professor | `professor@lab.com` | `123456` |
-| Aluno | `2024101001` (Ana Beatriz Souza) | `123456` |
-| Aluno | `2024101002` (Bruno Oliveira) | `123456` |
-| Aluno | `2024101003` (Carla Fernanda Lima) | `123456` |
-| Aluno | `2024101004` (Diego Almeida) | `123456` |
-| Aluno | `2024101005` (Eduarda Santos) | `123456` |
+- 1 administrador, 1 professor e 5 alunos;
+- 2 equipes;
+- 4 listas de exercícios;
+- entregas já corrigidas para demonstração.
 
-O seed cria ainda 2 equipes, 4 listas de exercícios e entregas já corrigidas para demonstração. Execute o seed novamente a qualquer momento para restaurar o estado inicial (o script limpa e recria todos os dados).
+> O seed **limpa e recria todos os dados**. Rode-o apenas para restaurar o estado de demonstração. Para criar um administrador **sem apagar nada**, use `npm run create-admin`.
 
-## Administração
+---
 
-O sistema possui um **painel administrativo** em `/login/admin` (papel `ADMIN`), acessível na landing page. O login usa **usuário e senha** (no formato `adminifce67`), não e-mail. Por ele é possível:
+## Painel administrativo
 
-- **Criar contas** de alunos (matrícula, curso e período), professores e outros administradores.
-- **Editar** nome, e-mail, curso/período (alunos) e redefinir senha.
+O papel **ADMIN** acessa o painel em `/login/admin` (link na landing page):
+
+- **Criar contas** de alunos (matrícula, curso e período), professores e administradores.
+- **Editar** nome, e-mail, curso/período e **redefinir senha**.
 - **Ativar/desativar** contas — usuários inativos não conseguem mais entrar.
 
-> O seed cria automaticamente o admin `adminifce67`. Para criar um admin **sem** apagar os dados (ex.: em produção), use o script:
+Para criar um administrador sem passar pelo painel (ex.: primeira vez em produção):
 
 ```bash
 cd backend
 npm run create-admin -- "Nome do Admin" "usuario" "senha-forte"
 ```
 
-Os endpoints administrativos (`/api/admin/*`) exigem autenticação com papel `ADMIN`.
+---
 
-## Principais rotas da API
+## Deploy na Vercel
 
-- `POST /api/auth/student/login`, `POST /api/auth/teacher/login` e `POST /api/auth/admin/login`
-- `GET /api/profile`
-- `GET /api/dashboard`
-- `GET/POST /api/teams`, `POST /api/teams/:id/invitations`
-- `POST /api/invitations/:id/accept` e `POST /api/invitations/:id/reject`
-- `GET/POST /api/assignments`, `POST /api/assignments/:id/submit`
-- `GET /api/submissions`, `PUT /api/submissions/:id/grade`
-- `GET/PUT /api/notifications`
-- `GET /api/reports`
-- `GET /api/admin/stats`, `GET/POST /api/admin/accounts`, `PUT /api/admin/accounts/:id`
+O repositório inclui um `vercel.json` na **raiz** que publica frontend e backend em um único projeto:
+
+- `api/index.js` reexporta o app Express como uma [Vercel Function](https://vercel.com/docs/functions) que atende todas as rotas `/api/*`.
+- O frontend é compilado com `vite build` e o `dist` servido como SPA.
+- `rewrites`: `/api/(.*)` vai para a função; o restante cai no `index.html`.
+
+**Passos:**
+
+1. Importe o repositório em [vercel.com/new](https://vercel.com/new), mantendo o **Root Directory** na raiz.
+2. Em **Settings > Environment Variables**, configure as mesmas variáveis do [.env](#variáveis-de-ambiente), com `CLIENT_URL` apontando para `https://seu-dominio.vercel.app`.
+3. Faça o deploy. As chamadas a `/api/*` são **same-origin**, sem depender de CORS ou proxy.
+
+---
+
+## Visão geral da API
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/api/auth/student/login` | Login do aluno (matrícula) |
+| POST | `/api/auth/teacher/login` | Login do professor (e-mail) |
+| POST | `/api/auth/admin/login` | Login do administrador (usuário) |
+| GET | `/api/profile` | Perfil do usuário autenticado |
+| GET | `/api/dashboard` | Dados do painel por papel |
+| GET/POST | `/api/teams` | Listar/criar equipes |
+| POST | `/api/teams/:id/invitations` | Convidar aluno para equipe |
+| POST | `/api/invitations/:id/accept` / `reject` | Responder convite |
+| GET/POST | `/api/assignments` | Listar/criar listas de exercícios |
+| POST | `/api/assignments/:id/submit` | Enviar entrega |
+| GET | `/api/submissions` | Listar entregas |
+| PUT | `/api/submissions/:id/grade` | Corrigir entrega |
+| GET/PUT | `/api/notifications` | Listar/marcar notificações |
+| GET | `/api/reports` | Relatórios de desempenho |
+| GET | `/api/admin/stats` | Estatísticas gerais (ADMIN) |
+| GET/POST | `/api/admin/accounts` | Listar/criar contas (ADMIN) |
+| PUT | `/api/admin/accounts/:id` | Editar/desativar conta (ADMIN) |
+
+---
+
+## Credenciais de teste
+
+Contas criadas pelo seed (senha padrão `123456`, exceto o administrador):
+
+| Papel | Usuário | Senha |
+|---|---|---|
+| Administrador | `adminifce67` | `adminifce67` |
+| Professor | `professor@lab.com` | `123456` |
+| Aluno | `2024101001` — Ana Beatriz Souza | `123456` |
+| Aluno | `2024101002` — Bruno Oliveira | `123456` |
+| Aluno | `2024101003` — Carla Fernanda Lima | `123456` |
+| Aluno | `2024101004` — Diego Almeida | `123456` |
+| Aluno | `2024101005` — Eduarda Santos | `123456` |
+
+---
+
+## Scripts
+
+**Backend** (`cd backend`)
+
+| Script | Descrição |
+|---|---|
+| `npm start` | Inicia a API em `localhost:3001` |
+| `npm run dev` | Inicia com hot reload |
+| `npm run seed` | Popula o Firestore (limpa e recria os dados) |
+| `npm run create-admin` | Cria um administrador sem apagar dados |
+
+**Frontend** (`cd frontend`)
+
+| Script | Descrição |
+|---|---|
+| `npm run dev` | Dev server em `localhost:5173` com proxy `/api` |
+| `npm run build` | Gera o build de produção em `dist/` |
+| `npm run preview` | Serve o build gerado |
+
+---
+
+## Licença
+
+Projeto acadêmico desenvolvido para o IFCE Campus Maranguape. Uso educacional.
