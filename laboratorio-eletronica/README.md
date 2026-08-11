@@ -116,15 +116,15 @@ O frontend fica em `http://localhost:5173` e redireciona requisições `/api/*` 
 
 ## Deploy na Vercel
 
-O repositório já inclui um `vercel.json` na raiz que faz o deploy de **frontend e backend em um único projeto**:
+O repositório já inclui um `vercel.json` na **raiz do repositório** que faz o deploy de **frontend e backend em um único projeto**:
 
-- `frontend/` é compilado com `vite build` (build estático servido como SPA).
-- `backend/src/server.js` é publicado como função serverless (`@vercel/node`), servindo todas as rotas `/api/*`.
+- `laboratorio-eletronica/frontend/` é compilado com `vite build` (build estático servido como SPA).
+- `laboratorio-eletronica/backend/src/server.js` é publicado como função serverless (`@vercel/node`), servindo todas as rotas `/api/*`.
 - Rotas de SPA (`/aluno/*`, `/professor/*`, etc.) caem no `index.html`.
 
 ### Passos
 
-1. Importe o repositório em [vercel.com/new](https://vercel.com/new) (pasta raiz do projeto, onde está o `vercel.json`).
+1. Importe o repositório em [vercel.com/new](https://vercel.com/new). Mantenha o **Root Directory** na raiz do repositório (o `vercel.json` já fica lá).
 2. Em **Settings → Environment Variables**, configure:
 
    ```env
