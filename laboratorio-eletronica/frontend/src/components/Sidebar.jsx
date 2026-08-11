@@ -23,11 +23,17 @@ const TEACHER_ITEMS = [
   { to: '/professor/perfil', label: 'Perfil', icon: 'fa-user' }
 ];
 
+const ADMIN_ITEMS = [
+  { to: '/admin/dashboard', label: 'Início', icon: 'fa-house' },
+  { to: '/admin/contas', label: 'Contas', icon: 'fa-user-gear' }
+];
+
 export default function Sidebar({ open, onClose, unreadCount }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const isStudent = user?.role === 'ALUNO';
-  const items = isStudent ? STUDENT_ITEMS : TEACHER_ITEMS;
+  const isAdmin = user?.role === 'ADMIN';
+  const items = isStudent ? STUDENT_ITEMS : isAdmin ? ADMIN_ITEMS : TEACHER_ITEMS;
 
   const handleLogout = () => {
     logout();
@@ -59,7 +65,7 @@ export default function Sidebar({ open, onClose, unreadCount }) {
           <Avatar name={user?.name} size="md" />
           <div className="sidebar__user-info">
             <strong>{user?.name}</strong>
-            <span>{isStudent ? 'Estudante' : 'Professor(a)'}</span>
+            <span>{isStudent ? 'Estudante' : isAdmin ? 'Administrador(a)' : 'Professor(a)'}</span>
           </div>
         </div>
 

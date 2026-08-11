@@ -1022,6 +1022,27 @@ a:hover {
   margin-bottom: 44px;
 }
 
+.hero__admin-link {
+  margin-bottom: 40px;
+}
+
+.hero__admin-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.45);
+  padding-bottom: 2px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.hero__admin-link a:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
 .hero__stats {
   display: flex;
   gap: 40px;
@@ -2125,6 +2146,16 @@ a:hover {
 .table .table__actions {
   text-align: right;
   width: 1%;
+}
+
+.table-actions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mt-24 {
+  margin-top: 24px;
 }
 
 .row--highlight {

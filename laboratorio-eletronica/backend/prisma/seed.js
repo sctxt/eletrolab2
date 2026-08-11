@@ -40,6 +40,16 @@ async function main() {
   });
   const teacher = await db.teacher.create({ data: { userId: teacherUser.id } });
 
+  console.log('Criando administrador...');
+  await db.user.create({
+    data: {
+      name: 'Administrador do Laboratório',
+      email: 'admin@lab.com',
+      password,
+      role: 'ADMIN'
+    }
+  });
+
   console.log('Criando estudantes...');
   const studentsData = [
     { name: 'Ana Beatriz Souza', registrationNumber: '2024101001', course: 'Engenharia de Computação', semester: 4 },
@@ -355,6 +365,7 @@ async function main() {
   console.log('Seed concluído com sucesso!');
   console.log('--------------------------------------------');
   console.log('Credenciais de teste:');
+  console.log('Admin:      admin@lab.com / 123456');
   console.log('Professor:  professor@lab.com / 123456');
   for (let i = 0; i < students.length; i++) {
     console.log(`Aluno:      ${students[i].registrationNumber} / 123456  (${names[i]})`);

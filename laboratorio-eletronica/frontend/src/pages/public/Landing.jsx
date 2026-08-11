@@ -82,6 +82,11 @@ export default function Landing() {
                 <i className="fas fa-chalkboard-user" /> Área do Professor
               </Link>
             </div>
+            <div className="hero__admin-link">
+              <Link to="/login/admin">
+                <i className="fas fa-user-shield" /> Área do Administrador
+              </Link>
+            </div>
             <div className="hero__stats">
               <div className="hero__stat">
                 <strong>5+</strong>

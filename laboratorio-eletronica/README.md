@@ -69,13 +69,13 @@ laboratorio-eletronica/
 ## Pré-requisitos
 
 - Node.js 18+
-- Projeto no **Firebase** (Firestore + Storage) e o **service account** correspondente
+- Projeto no **Firebase** (Firestore) e o **service account** correspondente
 
 ## Configuração
 
 ### 1. Firebase
 
-Crie um projeto no Firebase com **Firestore** e **Storage** habilitados e gere um **service account** (console > Configurações do projeto > Contas de serviço > Gerar nova chave privada). Em seguida configure `backend/.env` (copie de `.env.example`):
+Crie um projeto no Firebase com **Firestore** habilitado e gere um **service account** (console > Configurações do projeto > Contas de serviço > Gerar nova chave privada). Em seguida configure `backend/.env` (copie de `.env.example`):
 
 ```env
 PORT=3001
@@ -145,6 +145,7 @@ O repositório já inclui um `vercel.json` na **raiz do repositório** que faz o
 
 | Papel | Usuário | Senha |
 |-------|---------|-------|
+| Administrador | `admin@lab.com` | `123456` |
 | Professor | `professor@lab.com` | `123456` |
 | Aluno | `2024101001` (Ana Beatriz Souza) | `123456` |
 | Aluno | `2024101002` (Bruno Oliveira) | `123456` |
@@ -154,9 +155,26 @@ O repositório já inclui um `vercel.json` na **raiz do repositório** que faz o
 
 O seed cria ainda 2 equipes, 4 listas de exercícios e entregas já corrigidas para demonstração. Execute o seed novamente a qualquer momento para restaurar o estado inicial (o script limpa e recria todos os dados).
 
+## Administração
+
+O sistema possui um **painel administrativo** em `/login/admin` (papel `ADMIN`), acessível na landing page. Por ele é possível:
+
+- **Criar contas** de alunos (matrícula, curso e período), professores e outros administradores.
+- **Editar** nome, e-mail, curso/período (alunos) e redefinir senha.
+- **Ativar/desativar** contas — usuários inativos não conseguem mais entrar.
+
+> O seed cria automaticamente o admin `admin@lab.com`. Para criar um admin **sem** apagar os dados (ex.: em produção), use o script:
+
+```bash
+cd backend
+npm run create-admin -- "Nome do Admin" "admin@lab.com" "senha-forte"
+```
+
+Os endpoints administrativos (`/api/admin/*`) exigem autenticação com papel `ADMIN`.
+
 ## Principais rotas da API
 
-- `POST /api/auth/student/login` e `POST /api/auth/professor/login`
+- `POST /api/auth/student/login`, `POST /api/auth/teacher/login` e `POST /api/auth/admin/login`
 - `GET /api/profile`
 - `GET /api/dashboard`
 - `GET/POST /api/teams`, `POST /api/teams/:id/invitations`
@@ -165,3 +183,4 @@ O seed cria ainda 2 equipes, 4 listas de exercícios e entregas já corrigidas p
 - `GET /api/submissions`, `PUT /api/submissions/:id/grade`
 - `GET/PUT /api/notifications`
 - `GET /api/reports`
+- `GET /api/admin/stats`, `GET/POST /api/admin/accounts`, `PUT /api/admin/accounts/:id`

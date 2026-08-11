@@ -26,7 +26,9 @@ export function AuthProvider({ children }) {
     const data =
       type === 'aluno'
         ? await authApi.studentLogin(credentials)
-        : await authApi.teacherLogin(credentials);
+        : type === 'admin'
+          ? await authApi.adminLogin(credentials)
+          : await authApi.teacherLogin(credentials);
     saveSession(data);
     setUser(data.user);
     return data.user;

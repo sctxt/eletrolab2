@@ -66,7 +66,8 @@ export async function api(path, options = {}) {
 
 export const authApi = {
   studentLogin: (body) => api('/auth/student/login', { method: 'POST', body }),
-  teacherLogin: (body) => api('/auth/teacher/login', { method: 'POST', body })
+  teacherLogin: (body) => api('/auth/teacher/login', { method: 'POST', body }),
+  adminLogin: (body) => api('/auth/admin/login', { method: 'POST', body })
 };
 
 export const profileApi = {
@@ -130,4 +131,11 @@ export const dashboardApi = {
 
 export const reportApi = {
   get: () => api('/reports')
+};
+
+export const adminApi = {
+  stats: () => api('/admin/stats'),
+  listAccounts: (params = '') => api(`/admin/accounts${params}`),
+  createAccount: (body) => api('/admin/accounts', { method: 'POST', body }),
+  updateAccount: (id, body) => api(`/admin/accounts/${id}`, { method: 'PUT', body })
 };

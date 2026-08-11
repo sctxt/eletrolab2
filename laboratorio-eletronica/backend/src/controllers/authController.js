@@ -51,6 +51,42 @@ async function studentLogin(req, res, next) {
   }
 }
 
+async function adminLogin(req, res, next) {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      throw new AppError('Informe o e-mail e a senha.', 400);
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: normalizeEmail(email) }
+    });
+
+    if (!user || user.role !== 'ADMIN' || !user.active) {
+      throw new AppError('E-mail ou senha inválidos.', 401);
+    }
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      throw new AppError('E-mail ou senha inválidos.', 401);
+    }
+
+    const token = signToken({ id: user.id, role: user.role });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 async function teacherLogin(req, res, next) {
   try {
     const { email, password } = req.body;
@@ -89,4 +125,4 @@ async function teacherLogin(req, res, next) {
   }
 }
 
-module.exports = { studentLogin, teacherLogin };
+module.exports = { studentLogin, teacherLogin, adminLogin };
