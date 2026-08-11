@@ -145,7 +145,7 @@ O repositório já inclui um `vercel.json` na **raiz do repositório** que faz o
 
 | Papel | Usuário | Senha |
 |-------|---------|-------|
-| Administrador | `admin@lab.com` | `123456` |
+| Administrador | `adminifce67` | `adminifce67` |
 | Professor | `professor@lab.com` | `123456` |
 | Aluno | `2024101001` (Ana Beatriz Souza) | `123456` |
 | Aluno | `2024101002` (Bruno Oliveira) | `123456` |
@@ -157,17 +157,17 @@ O seed cria ainda 2 equipes, 4 listas de exercícios e entregas já corrigidas p
 
 ## Administração
 
-O sistema possui um **painel administrativo** em `/login/admin` (papel `ADMIN`), acessível na landing page. Por ele é possível:
+O sistema possui um **painel administrativo** em `/login/admin` (papel `ADMIN`), acessível na landing page. O login usa **usuário e senha** (no formato `adminifce67`), não e-mail. Por ele é possível:
 
 - **Criar contas** de alunos (matrícula, curso e período), professores e outros administradores.
 - **Editar** nome, e-mail, curso/período (alunos) e redefinir senha.
 - **Ativar/desativar** contas — usuários inativos não conseguem mais entrar.
 
-> O seed cria automaticamente o admin `admin@lab.com`. Para criar um admin **sem** apagar os dados (ex.: em produção), use o script:
+> O seed cria automaticamente o admin `adminifce67`. Para criar um admin **sem** apagar os dados (ex.: em produção), use o script:
 
 ```bash
 cd backend
-npm run create-admin -- "Nome do Admin" "admin@lab.com" "senha-forte"
+npm run create-admin -- "Nome do Admin" "usuario" "senha-forte"
 ```
 
 Os endpoints administrativos (`/api/admin/*`) exigem autenticação com papel `ADMIN`.

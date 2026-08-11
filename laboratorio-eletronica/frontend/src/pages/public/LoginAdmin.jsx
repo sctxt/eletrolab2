@@ -10,7 +10,7 @@ export default function LoginAdmin() {
   const { show } = useToast();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ username: '', password: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -23,8 +23,7 @@ export default function LoginAdmin() {
 
   const validate = () => {
     const next = {};
-    if (!form.email.trim()) next.email = 'Informe o e-mail.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = 'Informe um e-mail válido.';
+    if (!form.username.trim()) next.username = 'Informe o usuário.';
     if (!form.password) next.password = 'Informe a senha.';
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -73,13 +72,13 @@ export default function LoginAdmin() {
           <p className="auth-card__subtitle">Acesso restrito à coordenação do laboratório.</p>
 
           <form onSubmit={handleSubmit} noValidate>
-            <Field label="E-mail" error={errors.email} required>
+            <Field label="Usuário" error={errors.username} required>
               <TextInput
-                type="email"
-                name="email"
-                value={form.email}
+                type="text"
+                name="username"
+                value={form.username}
                 onChange={handleChange}
-                placeholder="admin@lab.com"
+                placeholder="adminifce67"
                 autoComplete="username"
               />
             </Field>

@@ -9,7 +9,7 @@ async function main() {
   const password = passwordArg || process.env.ADMIN_PASSWORD;
 
   if (!email || !password) {
-    console.error('Uso: node scripts/createAdmin.js <nome> <email> <senha>');
+    console.error('Uso: node scripts/createAdmin.js <nome> <usuario> <senha>');
     console.error('      (ou defina ADMIN_EMAIL e ADMIN_PASSWORD no ambiente)');
     process.exit(1);
   }

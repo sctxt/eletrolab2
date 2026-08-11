@@ -53,22 +53,22 @@ async function studentLogin(req, res, next) {
 
 async function adminLogin(req, res, next) {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      throw new AppError('Informe o e-mail e a senha.', 400);
+    const { username, password } = req.body;
+    if (!username || !password) {
+      throw new AppError('Informe o usuário e a senha.', 400);
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: normalizeEmail(email) }
+      where: { email: normalizeEmail(username) }
     });
 
     if (!user || user.role !== 'ADMIN' || !user.active) {
-      throw new AppError('E-mail ou senha inválidos.', 401);
+      throw new AppError('Usuário ou senha inválidos.', 401);
     }
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
-      throw new AppError('E-mail ou senha inválidos.', 401);
+      throw new AppError('Usuário ou senha inválidos.', 401);
     }
 
     const token = signToken({ id: user.id, role: user.role });
