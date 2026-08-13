@@ -8,6 +8,7 @@ const STUDENT_ITEMS = [
   { to: '/aluno/equipe', label: 'Minha Equipe', icon: 'fa-users' },
   { to: '/aluno/listas', label: 'Listas', icon: 'fa-list-check' },
   { to: '/aluno/historico', label: 'Histórico', icon: 'fa-clock-rotate-left' },
+  { to: '/aluno/calculadora', label: 'Calculadora de Resistores', icon: 'fa-calculator' },
   { to: '/aluno/notificacoes', label: 'Notificações', icon: 'fa-bell' },
   { to: '/aluno/perfil', label: 'Perfil', icon: 'fa-user' }
 ];

@@ -14,6 +14,7 @@ import StudentEquipe from '../pages/aluno/Equipe';
 import StudentListas from '../pages/aluno/Listas';
 import StudentListaDetalhe from '../pages/aluno/ListaDetalhe';
 import StudentHistorico from '../pages/aluno/Historico';
+import StudentCalculadora from '../pages/aluno/Calculadora';
 import StudentPerfil from '../pages/aluno/Perfil';
 
 import TeacherDashboard from '../pages/professor/Dashboard';
@@ -38,6 +39,7 @@ const studentRoutes = [
   { path: '/aluno/listas', element: <StudentListas /> },
   { path: '/aluno/listas/:id', element: <StudentListaDetalhe /> },
   { path: '/aluno/historico', element: <StudentHistorico /> },
+  { path: '/aluno/calculadora', element: <StudentCalculadora /> },
   { path: '/aluno/notificacoes', element: <Notificacoes /> },
   { path: '/aluno/perfil', element: <StudentPerfil /> }
 ];

@@ -3504,6 +3504,380 @@ a:hover {
 }
 
 /* =========================================================
+   Calculadora de Resistores
+   ========================================================= */
+
+.calc-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--gray-50);
+  padding: 12px 0;
+  margin-bottom: 8px;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.calc-form {
+  display: grid;
+  gap: 16px;
+}
+
+.calc-results {
+  display: grid;
+  gap: 16px;
+}
+
+.calc-results__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.calc-result {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--green-50);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calc-result--amber {
+  background: var(--amber-100);
+  border-color: var(--amber-500);
+}
+
+.calc-result--gray {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
+}
+
+.calc-result__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calc-result__value {
+  font-size: 1.3rem;
+  color: var(--green-800);
+  font-variant-numeric: tabular-nums;
+}
+
+.calc-result--amber .calc-result__value {
+  color: var(--amber-600);
+}
+
+.calc-result--gray .calc-result__value {
+  color: var(--gray-800);
+}
+
+.calc-result__hint {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.calc-formula-note {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin: 12px 0 0;
+}
+
+.calc-formula-note i {
+  color: var(--amber-500);
+  margin-right: 4px;
+}
+
+/* Resistor visual */
+
+.resistor-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 84px 26px;
+  background: var(--green-50);
+  border: 1px dashed var(--green-200);
+  border-radius: var(--radius);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.resistor {
+  position: relative;
+  width: 230px;
+  height: 58px;
+}
+
+.resistor__body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #e8caa0, #cf9f6e);
+  border: 1px solid #b98d5f;
+  border-radius: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 24px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.resistor__band {
+  width: 15px;
+  height: 74%;
+  border-radius: 3px;
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.28);
+}
+
+.resistor__band--gap {
+  margin-left: 16px;
+}
+
+.resistor__band--none {
+  background: transparent;
+  border: 2px dashed var(--gray-400);
+  box-shadow: none;
+}
+
+.resistor__lead {
+  position: absolute;
+  top: 50%;
+  width: 68px;
+  height: 7px;
+  background: linear-gradient(180deg, #cfd8dc, #90a4ae);
+  border-radius: 4px;
+  transform: translateY(-50%);
+}
+
+.resistor__lead--left {
+  right: 100%;
+  margin-right: -6px;
+}
+
+.resistor__lead--right {
+  left: 100%;
+  margin-left: -6px;
+}
+
+.resistor-visual__note {
+  width: 100%;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--gray-500);
+}
+
+.band-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 14px 0 16px;
+}
+
+.band-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--gray-700);
+}
+
+.band-legend__swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--gray-300);
+}
+
+.band-legend__swatch--none {
+  background: transparent;
+  border: 2px dashed var(--gray-400);
+}
+
+/* Tolerância */
+
+.calc-tol-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+
+.calc-tol-preview__band {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-300);
+  flex-shrink: 0;
+}
+
+.calc-tol-preview__band:empty {
+  border: 2px dashed var(--gray-400);
+}
+
+.calc-tol-preview p {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--gray-600);
+}
+
+/* Séries E */
+
+.e-series-results {
+  display: grid;
+  gap: 14px;
+}
+
+.e-series-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  background: #fff;
+}
+
+.e-series-card--e96 {
+  border-color: var(--green-300);
+}
+
+.e-series-card__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.e-series-card__head strong {
+  font-size: 1.05rem;
+  color: var(--gray-900);
+}
+
+.e-series-card__head span {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.e-series-card__value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.e-series-card__value > span {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.e-series-card__value > strong {
+  font-size: 1.25rem;
+  color: var(--green-800);
+  font-variant-numeric: tabular-nums;
+}
+
+.e-series-card__exact {
+  font-size: 0.75rem;
+  font-style: normal;
+  color: var(--green-700);
+  background: var(--green-100);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.e-series-card__range {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.e-series-card__range i {
+  margin-right: 3px;
+}
+
+/* Associação série/paralelo */
+
+.quick-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.quick-add__label {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+.quick-add__chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--gray-300);
+  background: #fff;
+  color: var(--gray-600);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-add__chip:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+}
+
+.resistor-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  display: grid;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.resistor-list__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.resistor-list__index {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--green-700);
+  background: var(--green-100);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.resistor-list__item strong {
+  flex: 1;
+  color: var(--gray-800);
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
    Responsividade
    ========================================================= */
 
@@ -3591,6 +3965,10 @@ a:hover {
     grid-template-columns: 1fr;
   }
 
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+
   .navbar__links {
     display: none;
   }
@@ -3607,6 +3985,18 @@ a:hover {
 @media (max-width: 600px) {
   .panel__content {
     padding: 16px;
+  }
+
+  .calc-results__row {
+    grid-template-columns: 1fr;
+  }
+
+  .resistor-visual {
+    padding: 28px 16px 22px;
+  }
+
+  .resistor {
+    width: 190px;
   }
 
   .panel__topbar {
